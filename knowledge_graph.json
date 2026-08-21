@@ -1,0 +1,160 @@
+{
+  "project_name": "Society Maintenance Tracker",
+  "last_updated": "2026-08-25",
+  "source_documents": [
+    {
+      "id": "doc_problem_statement",
+      "title": "Society Maintenance Tracker (Problem Statement)",
+      "role": "Defines required features, deliverables, and evaluation focus"
+    },
+    {
+      "id": "doc_submission_guidelines",
+      "title": "Assignment Submission Usage Guidelines",
+      "role": "Defines how and where the finished project must be submitted"
+    }
+  ],
+  "actors": [
+    {
+      "id": "actor_resident",
+      "capabilities": [
+        "register_and_login",
+        "raise_complaint_with_category_description_photo",
+        "view_own_complaints_with_status_history",
+        "view_notice_board",
+        "receive_email_on_status_change",
+        "receive_email_on_important_notice"
+      ]
+    },
+    {
+      "id": "actor_admin",
+      "capabilities": [
+        "view_all_complaints",
+        "filter_complaints_by_category_status_date",
+        "set_priority_low_medium_high",
+        "update_complaint_status_open_inprogress_resolved",
+        "view_overdue_complaints_surfaced_top",
+        "flag_overdue_based_on_configurable_threshold",
+        "post_notice",
+        "mark_notice_important_pinned",
+        "view_dashboard"
+      ]
+    }
+  ],
+  "core_entities": [
+    {
+      "id": "entity_complaint",
+      "fields": ["category", "description", "photo (optional)", "status", "priority", "resident_id", "created_at"],
+      "status_lifecycle": ["Open", "In Progress", "Resolved"],
+      "rule": "Once Resolved, complaint is closed"
+    },
+    {
+      "id": "entity_complaint_status_history",
+      "fields": ["complaint_id", "old_status", "new_status", "actor", "note (optional)", "timestamp"],
+      "rule": "Recorded on every status change"
+    },
+    {
+      "id": "entity_notice",
+      "fields": ["title", "body", "is_important", "posted_by", "created_at"],
+      "rule": "is_important = true pins notice to top of board"
+    },
+    {
+      "id": "entity_user",
+      "fields": ["name", "email", "password_hash", "role (resident|admin)"]
+    },
+    {
+      "id": "entity_dashboard",
+      "aggregates": ["count_by_status", "count_by_category", "count_overdue"]
+    }
+  ],
+  "functional_requirements": [
+    { "id": "fr_auth", "description": "Role-based auth for resident and admin" },
+    { "id": "fr_complaint_create", "description": "Resident raises complaint with category, description, optional photo" },
+    { "id": "fr_complaint_history", "description": "Full status history visible to resident" },
+    { "id": "fr_admin_filter", "description": "Admin filters complaints by category, status, date" },
+    { "id": "fr_priority", "description": "Admin sets priority Low/Medium/High" },
+    { "id": "fr_status_update", "description": "Admin updates status with timestamped, attributed history and optional note" },
+    { "id": "fr_overdue", "description": "Overdue flag when open beyond configurable threshold; surfaces at top of admin view" },
+    { "id": "fr_notice_board", "description": "Admin posts notices; important ones pinned to top" },
+    { "id": "fr_email", "description": "Email on status change and on important notice, via any free-tier provider" },
+    { "id": "fr_dashboard", "description": "Totals by status, by category, overdue count" }
+  ],
+  "technical_expectations": [
+    "Backend API, Frontend, Database",
+    "Role-based auth (resident, admin)",
+    "Status history with timestamp, actor, note",
+    "Photo upload handling",
+    "Configurable overdue threshold",
+    "Notice board with pinned important notices",
+    "Email integration (free tier)"
+  ],
+  "deliverables": [
+    { "id": "del_zip", "description": "Zip file with complete source code", "source": "doc_problem_statement" },
+    { "id": "del_readme", "description": "README with setup guide, .env.example, API docs, DB schema", "source": "doc_problem_statement" },
+    { "id": "del_hosted_url", "description": "Hosted application URL (Vercel, Render, Railway, or similar)", "source": "doc_problem_statement" },
+    { "id": "del_design_writeup", "description": "System design write-up, max 800 words: complaint history model, overdue detection, photo handling, notification flow", "source": "doc_problem_statement" }
+  ],
+  "submission_constraints": [
+    { "id": "sc_format_primary", "description": "GitHub repo, branch main, public/open-source, downloadable, within GitHub size limits", "source": "doc_submission_guidelines" },
+    { "id": "sc_format_alt", "description": "Google Drive link as alternative, publicly accessible, downloadable, ideally <1GB", "source": "doc_submission_guidelines" },
+    { "id": "sc_exclude_files", "description": "No node_modules, .env, build artifacts, editor-specific files", "source": "doc_submission_guidelines" },
+    { "id": "sc_dependencies", "description": "Only strictly required packages; minimal and native where possible", "source": "doc_submission_guidelines" },
+    { "id": "sc_checklist", "description": "App runs error-free, proper structure/naming, no junk files, branch main, link publicly accessible, size within limits, documentation present", "source": "doc_submission_guidelines" }
+  ],
+  "evaluation_focus": [
+    "Complaint lifecycle and status history design",
+    "Overdue detection and priority handling",
+    "Photo upload and notice board design",
+    "Dashboard and reporting",
+    "Database schema, API design, and documentation"
+  ],
+  "open_decisions": [
+    {
+      "id": "dec_tech_stack",
+      "question": "What backend, frontend, and database will be used?",
+      "resolved": false,
+      "options_considered": [],
+      "chosen_option": null
+    },
+    {
+      "id": "dec_photo_storage",
+      "question": "Where are uploaded photos stored?",
+      "resolved": false,
+      "options_considered": ["local disk", "Cloudinary free tier", "Supabase Storage", "S3 free tier"],
+      "chosen_option": null
+    },
+    {
+      "id": "dec_email_provider",
+      "question": "Which free-tier email service is used?",
+      "resolved": false,
+      "options_considered": ["Nodemailer + Gmail SMTP", "Resend", "Brevo", "Mailgun sandbox", "SendGrid free tier"],
+      "chosen_option": null
+    },
+    {
+      "id": "dec_overdue_config",
+      "question": "Is the overdue threshold an env var or an admin-editable DB setting?",
+      "resolved": false,
+      "options_considered": ["env variable", "admin settings table + UI"],
+      "chosen_option": null
+    },
+    {
+      "id": "dec_zip_vs_repo",
+      "question": "Does the GitHub repo submission satisfy the 'zip file' deliverable, or is a separate zip needed?",
+      "resolved": false,
+      "options_considered": ["GitHub repo download-zip satisfies it", "attach zip as a GitHub Release asset", "confirm with grader/instructor"],
+      "chosen_option": null
+    },
+    {
+      "id": "dec_hosting_platform",
+      "question": "Which hosting platform is used for deployment?",
+      "resolved": false,
+      "options_considered": ["Vercel", "Render", "Railway", "other"],
+      "chosen_option": null
+    }
+  ],
+  "progress_log": [
+    {
+      "date": "2026-08-25",
+      "event": "Initial knowledge graph created from problem statement and submission guidelines. No code written yet."
+    }
+  ]
+}

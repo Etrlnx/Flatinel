@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: flatinel-society-tracker
+    env: python
+    buildCommand: |
+      pip install -r backend/requirements.txt
+      cd frontend && npm install && npm run build && cd ..
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PROJECT_NAME
+        value: Society Maintenance Tracker
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEFAULT_OVERDUE_DAYS
+        value: "3"

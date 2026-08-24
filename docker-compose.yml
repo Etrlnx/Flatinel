@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: flatinel_app
+    ports:
+      - "8000:8000"
+    environment:
+      - PROJECT_NAME=Society Maintenance Tracker
+      - ENVIRONMENT=production
+      - SECRET_KEY=production_secret_key_change_me
+      - DATABASE_URL=sqlite:///./society_maintenance.db
+      - DEFAULT_OVERDUE_DAYS=3
+    volumes:
+      - app_data:/app/backend/uploads
+
+volumes:
+  app_data:

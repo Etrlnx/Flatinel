@@ -1,5 +1,5 @@
 {
-  "project_name": "Society Maintenance Tracker",
+  "project_name": "Society Maintenance Tracker (Flatinel)",
   "last_updated": "2026-08-25",
   "source_documents": [
     {
@@ -36,125 +36,110 @@
         "flag_overdue_based_on_configurable_threshold",
         "post_notice",
         "mark_notice_important_pinned",
-        "view_dashboard"
+        "view_dashboard",
+        "configure_overdue_threshold"
       ]
     }
   ],
   "core_entities": [
     {
       "id": "entity_complaint",
-      "fields": ["category", "description", "photo (optional)", "status", "priority", "resident_id", "created_at"],
+      "fields": ["category", "description", "photo (optional)", "status", "priority", "resident_id", "created_at", "updated_at", "resolved_at"],
       "status_lifecycle": ["Open", "In Progress", "Resolved"],
       "rule": "Once Resolved, complaint is closed"
     },
     {
       "id": "entity_complaint_status_history",
-      "fields": ["complaint_id", "old_status", "new_status", "actor", "note (optional)", "timestamp"],
+      "fields": ["complaint_id", "old_status", "new_status", "actor_id", "actor_name", "note (optional)", "timestamp"],
       "rule": "Recorded on every status change"
     },
     {
       "id": "entity_notice",
-      "fields": ["title", "body", "is_important", "posted_by", "created_at"],
-      "rule": "is_important = true pins notice to top of board"
+      "fields": ["title", "body", "is_important", "posted_by", "created_at", "updated_at"],
+      "rule": "is_important = true pins notice to top of board and triggers resident notification"
     },
     {
       "id": "entity_user",
-      "fields": ["name", "email", "password_hash", "role (resident|admin)"]
+      "fields": ["name", "email", "password_hash", "role (resident|admin)", "unit_no", "phone"]
+    },
+    {
+      "id": "entity_app_setting",
+      "fields": ["key", "value", "description", "updated_at"]
     },
     {
       "id": "entity_dashboard",
-      "aggregates": ["count_by_status", "count_by_category", "count_overdue"]
+      "aggregates": ["count_by_status", "count_by_category", "count_by_priority", "count_overdue", "recent_activity"]
     }
   ],
   "functional_requirements": [
-    { "id": "fr_auth", "description": "Role-based auth for resident and admin" },
+    { "id": "fr_auth", "description": "Role-based auth for resident and admin with JWT and bcrypt" },
     { "id": "fr_complaint_create", "description": "Resident raises complaint with category, description, optional photo" },
-    { "id": "fr_complaint_history", "description": "Full status history visible to resident" },
-    { "id": "fr_admin_filter", "description": "Admin filters complaints by category, status, date" },
+    { "id": "fr_complaint_history", "description": "Full status history visible to resident and admin" },
+    { "id": "fr_admin_filter", "description": "Admin filters complaints by category, status, date, and text query" },
     { "id": "fr_priority", "description": "Admin sets priority Low/Medium/High" },
     { "id": "fr_status_update", "description": "Admin updates status with timestamped, attributed history and optional note" },
     { "id": "fr_overdue", "description": "Overdue flag when open beyond configurable threshold; surfaces at top of admin view" },
     { "id": "fr_notice_board", "description": "Admin posts notices; important ones pinned to top" },
-    { "id": "fr_email", "description": "Email on status change and on important notice, via any free-tier provider" },
-    { "id": "fr_dashboard", "description": "Totals by status, by category, overdue count" }
+    { "id": "fr_email", "description": "Email on status change and on important notice, via async background dispatch" },
+    { "id": "fr_dashboard", "description": "Totals by status, by category, priority distribution, overdue count" }
   ],
   "technical_expectations": [
-    "Backend API, Frontend, Database",
+    "FastAPI Backend API, React Frontend, SQLAlchemy Database",
     "Role-based auth (resident, admin)",
     "Status history with timestamp, actor, note",
-    "Photo upload handling",
-    "Configurable overdue threshold",
+    "Photo upload handling with MIME and size validation",
+    "Configurable overdue threshold with UI settings manager",
     "Notice board with pinned important notices",
-    "Email integration (free tier)"
+    "Email integration with async background worker"
   ],
   "deliverables": [
-    { "id": "del_zip", "description": "Zip file with complete source code", "source": "doc_problem_statement" },
-    { "id": "del_readme", "description": "README with setup guide, .env.example, API docs, DB schema", "source": "doc_problem_statement" },
-    { "id": "del_hosted_url", "description": "Hosted application URL (Vercel, Render, Railway, or similar)", "source": "doc_problem_statement" },
-    { "id": "del_design_writeup", "description": "System design write-up, max 800 words: complaint history model, overdue detection, photo handling, notification flow", "source": "doc_problem_statement" }
-  ],
-  "submission_constraints": [
-    { "id": "sc_format_primary", "description": "GitHub repo, branch main, public/open-source, downloadable, within GitHub size limits", "source": "doc_submission_guidelines" },
-    { "id": "sc_format_alt", "description": "Google Drive link as alternative, publicly accessible, downloadable, ideally <1GB", "source": "doc_submission_guidelines" },
-    { "id": "sc_exclude_files", "description": "No node_modules, .env, build artifacts, editor-specific files", "source": "doc_submission_guidelines" },
-    { "id": "sc_dependencies", "description": "Only strictly required packages; minimal and native where possible", "source": "doc_submission_guidelines" },
-    { "id": "sc_checklist", "description": "App runs error-free, proper structure/naming, no junk files, branch main, link publicly accessible, size within limits, documentation present", "source": "doc_submission_guidelines" }
-  ],
-  "evaluation_focus": [
-    "Complaint lifecycle and status history design",
-    "Overdue detection and priority handling",
-    "Photo upload and notice board design",
-    "Dashboard and reporting",
-    "Database schema, API design, and documentation"
+    { "id": "del_source_code", "description": "Complete clean repository source code", "source": "doc_problem_statement", "status": "completed" },
+    { "id": "del_readme", "description": "README with setup guide, .env.example, API docs, DB schema", "source": "doc_problem_statement", "status": "completed" },
+    { "id": "del_design_writeup", "description": "System design write-up, max 800 words: complaint history model, overdue detection, photo handling, notification flow", "source": "doc_problem_statement", "status": "completed" },
+    { "id": "del_api_docs", "description": "API documentation and Swagger specifications", "source": "doc_problem_statement", "status": "completed" },
+    { "id": "del_database_schema", "description": "Database schema and ER diagram", "source": "doc_problem_statement", "status": "completed" }
   ],
   "open_decisions": [
     {
       "id": "dec_tech_stack",
       "question": "What backend, frontend, and database will be used?",
-      "resolved": false,
-      "options_considered": [],
-      "chosen_option": null
+      "resolved": true,
+      "options_considered": ["Node/Express", "Django", "FastAPI + React + SQLAlchemy"],
+      "chosen_option": "FastAPI (Python) + React (Vite/Tailwind) + SQLAlchemy ORM (SQLite/PostgreSQL)"
     },
     {
       "id": "dec_photo_storage",
       "question": "Where are uploaded photos stored?",
-      "resolved": false,
+      "resolved": true,
       "options_considered": ["local disk", "Cloudinary free tier", "Supabase Storage", "S3 free tier"],
-      "chosen_option": null
+      "chosen_option": "FastAPI static uploads directory with secure UUID hashing, MIME verification and 5MB validation"
     },
     {
       "id": "dec_email_provider",
       "question": "Which free-tier email service is used?",
-      "resolved": false,
-      "options_considered": ["Nodemailer + Gmail SMTP", "Resend", "Brevo", "Mailgun sandbox", "SendGrid free tier"],
-      "chosen_option": null
+      "resolved": true,
+      "options_considered": ["SMTP (Gmail/Brevo/SendGrid)", "Resend", "Console mock logger fallback"],
+      "chosen_option": "Async background SMTP mailer with TLS and automatic mock logging fallback"
     },
     {
       "id": "dec_overdue_config",
       "question": "Is the overdue threshold an env var or an admin-editable DB setting?",
-      "resolved": false,
+      "resolved": true,
       "options_considered": ["env variable", "admin settings table + UI"],
-      "chosen_option": null
-    },
-    {
-      "id": "dec_zip_vs_repo",
-      "question": "Does the GitHub repo submission satisfy the 'zip file' deliverable, or is a separate zip needed?",
-      "resolved": false,
-      "options_considered": ["GitHub repo download-zip satisfies it", "attach zip as a GitHub Release asset", "confirm with grader/instructor"],
-      "chosen_option": null
+      "chosen_option": "Admin-editable database settings table with REST endpoint and UI modal, backed by env default"
     },
     {
       "id": "dec_hosting_platform",
       "question": "Which hosting platform is used for deployment?",
-      "resolved": false,
-      "options_considered": ["Vercel", "Render", "Railway", "other"],
-      "chosen_option": null
+      "resolved": true,
+      "options_considered": ["Render", "Vercel", "Railway"],
+      "chosen_option": "Ready for deployment on Render/Railway with single command startup and environment variables"
     }
   ],
   "progress_log": [
     {
       "date": "2026-08-25",
-      "event": "Initial knowledge graph created from problem statement and submission guidelines. No code written yet."
+      "event": "Full-stack society maintenance tracker application built: FastAPI backend, SQLAlchemy models, React frontend, photo upload, audit history, overdue rules, notice board, pytest suite, and system design docs."
     }
   ]
 }
